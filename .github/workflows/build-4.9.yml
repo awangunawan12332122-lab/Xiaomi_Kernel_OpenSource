@@ -30,7 +30,7 @@ on:
         type: string
       kernel-url:
         description: 'URL Kernel'
-        default: 'https://github.com/awangunawan12332122-lab/Xiaomi_Kernel_OpenSource/tree/dipper-q-oss'
+        default: 'https://github.com/awangunawan12332122-lab/Xiaomi_Kernel_OpenSource.git'
         required: true
         type: string
       kernel-branch:
@@ -271,4 +271,3 @@ jobs:
       with:
         name: "${{ inputs.name }}"
         path: Upload/*
-
