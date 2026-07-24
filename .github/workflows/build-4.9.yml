@@ -230,8 +230,8 @@ jobs:
          export KBUILD_BUILD_USER="〩Beler"
          export KBUILD_BUILD_HOST="Builder"
          
-         # Tambahan HOSTCFLAGS=-fcommon disematkan langsung pada komando
-         COMMAND="make -j$(nproc --all) O=$OUT_DIR ARCH=arm64 HOSTCFLAGS=-fcommon"
+         # Tambahan HOSTCFLAGS dan KCFLAGS untuk mem-bypass warning/error kompiler Clang terbaru
+         COMMAND="make -j$(nproc --all) O=$OUT_DIR ARCH=arm64 HOSTCFLAGS=-fcommon KCFLAGS=-Wno-initializer-overrides"
          
          if [ "${{ inputs.aosp-clang }}" == "false" ]; then
                 COMMAND+=" CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CROSS_COMPILE_COMPAT=arm-linux-gnueabi-"
@@ -283,4 +283,3 @@ jobs:
       with:
         name: "${{ inputs.name }}"
         path: Upload/*
-        
