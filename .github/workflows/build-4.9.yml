@@ -230,8 +230,8 @@ jobs:
          export KBUILD_BUILD_USER="〩Beler"
          export KBUILD_BUILD_HOST="Builder"
          
-         # Tambahan HOSTCFLAGS dan KCFLAGS untuk mem-bypass warning/error kompiler Clang terbaru
-         COMMAND="make -j$(nproc --all) O=$OUT_DIR ARCH=arm64 HOSTCFLAGS=-fcommon KCFLAGS=-Wno-initializer-overrides"
+         # Tambahan HOSTCFLAGS dan KCFLAGS untuk mem-bypass strict warnings Clang terbaru agar build tidak error
+         COMMAND="make -j$(nproc --all) O=$OUT_DIR ARCH=arm64 HOSTCFLAGS=-fcommon KCFLAGS=\"-Wno-error -Wno-unknown-warning-option -Wno-initializer-overrides -Wno-pointer-sign -Wno-uninitialized\""
          
          if [ "${{ inputs.aosp-clang }}" == "false" ]; then
                 COMMAND+=" CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CROSS_COMPILE_COMPAT=arm-linux-gnueabi-"
@@ -283,3 +283,4 @@ jobs:
       with:
         name: "${{ inputs.name }}"
         path: Upload/*
+        
