@@ -1,4 +1,3 @@
-# KERNEL BUILDER
 name: KERNEL BUILDER
 on:
   workflow_dispatch:
@@ -165,7 +164,7 @@ jobs:
             ls
          fi
          
-    - name: Menonaktifkan LTO dan Mengatur Konfigurasi K4.9
+    - name: Menonaktifkan LTO dan Mengatur Konfigurasi Kernel 4.9
       run: |
          if [ "${{ inputs.kernel-url }}" != "false" ]; then
             cd kernel-dir
@@ -230,8 +229,9 @@ jobs:
          export KBUILD_BUILD_USER="〩Beler"
          export KBUILD_BUILD_HOST="Builder"
          
-         # Tambahan HOSTCFLAGS dan KCFLAGS untuk mem-bypass strict warnings Clang terbaru agar build tidak error
-         COMMAND="make -j$(nproc --all) O=$OUT_DIR ARCH=arm64 HOSTCFLAGS=-fcommon KCFLAGS=\"-Wno-error -Wno-unknown-warning-option -Wno-initializer-overrides -Wno-pointer-sign -Wno-uninitialized\""
+         # Perbaikan penulisan KCFLAGS agar tidak terjadi unterminated quoted string
+         KCFLAGS_OPTS="-Wno-error -Wno-unknown-warning-option -Wno-initializer-overrides -Wno-pointer-sign -Wno-uninitialized"
+         COMMAND="make -j$(nproc --all) O=$OUT_DIR ARCH=arm64 HOSTCFLAGS=-fcommon KCFLAGS='$KCFLAGS_OPTS'"
          
          if [ "${{ inputs.aosp-clang }}" == "false" ]; then
                 COMMAND+=" CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CROSS_COMPILE_COMPAT=arm-linux-gnueabi-"
