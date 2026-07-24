@@ -15,7 +15,7 @@ on:
         type: string
       aosp-clang:
         description: 'Versi Clang | false | 11 | 13 | 14 | 19 | 20 | 21 | 22'
-        default: '14'
+        default: '11'
         required: true
         type: string
       package:
@@ -165,20 +165,27 @@ jobs:
             ls
          fi
          
-    - name: Menonaktifkan LTO
+    - name: Menonaktifkan LTO dan Mengatur Konfigurasi K4.9
       run: |
          if [ "${{ inputs.kernel-url }}" != "false" ]; then
             cd kernel-dir
          fi
+         CONFIG_PATH="arch/arm64/configs/${{ inputs.kernel-config }}"
+         
+         # Mematikan LTO sesuai parameter input
          if [ "${{ inputs.disable-lto }}" == "true" ]; then
-             if grep -q "LTO" "arch/arm64/configs/${{ inputs.kernel-config }}"
-             then
-                  sed -i 's/CONFIG_LTO=y/CONFIG_LTO=n/' arch/arm64/configs/${{ inputs.kernel-config }} 
-                  sed -i 's/CONFIG_LTO_CLANG=y/CONFIG_LTO_CLANG=n/' arch/arm64/configs/${{ inputs.kernel-config }} 
-                  sed -i 's/CONFIG_THINLTO=y/CONFIG_THINLTO=n/' arch/arm64/configs/${{ inputs.kernel-config }} 
-                  echo "CONFIG_LTO_NONE=y" | tee -a arch/arm64/configs/${{ inputs.kernel-config }} >/dev/null
+             if grep -q "LTO" "$CONFIG_PATH"; then
+                  sed -i 's/CONFIG_LTO=y/CONFIG_LTO=n/' "$CONFIG_PATH" 
+                  sed -i 's/CONFIG_LTO_CLANG=y/CONFIG_LTO_CLANG=n/' "$CONFIG_PATH" 
+                  sed -i 's/CONFIG_THINLTO=y/CONFIG_THINLTO=n/' "$CONFIG_PATH" 
+                  echo "CONFIG_LTO_NONE=y" | tee -a "$CONFIG_PATH" >/dev/null
              fi
          fi
+         
+         # FIX Khusus untuk Kernel 4.9: Mematikan Stack Protector Strong 
+         sed -i 's/CONFIG_CC_STACKPROTECTOR_STRONG=y/CONFIG_CC_STACKPROTECTOR_STRONG=n/' "$CONFIG_PATH" || true
+         sed -i 's/CONFIG_CC_STACKPROTECTOR=y/CONFIG_CC_STACKPROTECTOR=n/' "$CONFIG_PATH" || true
+         echo "CONFIG_CC_STACKPROTECTOR_AUTO=y" | tee -a "$CONFIG_PATH" >/dev/null
          
     - name: Mempersiapkan KernelSU-Next
       run: |
@@ -271,3 +278,4 @@ jobs:
       with:
         name: "${{ inputs.name }}"
         path: Upload/*
+        
