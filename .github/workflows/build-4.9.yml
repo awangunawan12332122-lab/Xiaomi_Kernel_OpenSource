@@ -225,11 +225,9 @@ jobs:
          export KBUILD_BUILD_USER="〩Beler"
          export KBUILD_BUILD_HOST="Builder"
          
-         # Menggunakan variabel lingkungan langsung tanpa variabel string command bertingkat agar aman dari syntax error kutip
          export HOSTCFLAGS="-fcommon"
-         export KCFLAGS="-Wno-error -Wno-unknown-warning-option -Wno-initializer-overrides -Wno-pointer-sign -Wno-uninitialized -Wno-address-of-packed-member"
+         export KCFLAGS="-Wno-error -Wno-unknown-warning-option -Wno-initializer-overrides -Wno-pointer-sign -Wno-uninitialized -Wno-address-of-packed-member -Wno-tautological-pointer-compare -Wno-tautological-overlap-compare"
          
-         # Tentukan opsi cross-compile dasar
          if [ "${{ inputs.aosp-clang }}" == "false" ]; then
             export CROSS_COMPILE="aarch64-linux-gnu-"
             export CROSS_COMPILE_ARM32="arm-linux-gnueabi-"
@@ -241,7 +239,6 @@ jobs:
             export CLANG_TRIPLE="aarch64-linux-gnu-"
          fi
          
-         # Tambahan argumen kompiler sesuai pilihan
          EXTRA_ARGS=""
          if [ "${{ inputs.compiler }}" == "clang" ]; then
             EXTRA_ARGS="CC=clang LLVM=1 LLVM_IAS=1"
@@ -255,7 +252,6 @@ jobs:
             EXTRA_ARGS="${{ inputs.command }}"
          fi
          
-         # Jalankan make secara langsung dengan parameter terpisah
          make -j$(nproc --all) O=$OUT_DIR ARCH=arm64 $EXTRA_ARGS ${{ inputs.kernel-config }}
          make -j$(nproc --all) O=$OUT_DIR ARCH=arm64 $EXTRA_ARGS all
          
