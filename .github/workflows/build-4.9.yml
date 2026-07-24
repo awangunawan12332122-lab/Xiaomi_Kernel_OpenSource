@@ -229,9 +229,11 @@ jobs:
          export KBUILD_BUILD_USER="〩Beler"
          export KBUILD_BUILD_HOST="Builder"
          
-         # Perbaikan penulisan KCFLAGS agar tidak terjadi unterminated quoted string
-         KCFLAGS_OPTS="-Wno-error -Wno-unknown-warning-option -Wno-initializer-overrides -Wno-pointer-sign -Wno-uninitialized"
-         COMMAND="make -j$(nproc --all) O=$OUT_DIR ARCH=arm64 HOSTCFLAGS=-fcommon KCFLAGS='$KCFLAGS_OPTS'"
+         # Menggunakan environment variable agar aman dari unterminated quoted string
+         export HOSTCFLAGS="-fcommon"
+         export KCFLAGS="-Wno-error -Wno-unknown-warning-option -Wno-initializer-overrides -Wno-pointer-sign -Wno-uninitialized"
+         
+         COMMAND="make -j$(nproc --all) O=$OUT_DIR ARCH=arm64"
          
          if [ "${{ inputs.aosp-clang }}" == "false" ]; then
                 COMMAND+=" CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CROSS_COMPILE_COMPAT=arm-linux-gnueabi-"
@@ -283,4 +285,3 @@ jobs:
       with:
         name: "${{ inputs.name }}"
         path: Upload/*
-        
